@@ -35,6 +35,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 from django.db.models import Count
+from rest_framework.decorators import api_view
 
 class ReviewViewSet(viewsets.ModelViewSet):
     ...
@@ -51,4 +52,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(reviews, many=True)
         return Response(serializer.data)
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.models import User
+
+@api_view(['POST'])
+def register_user(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    if username and password:
+        user = User.objects.create_user(username=username, password=password)
+        return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+    return Response({'error': 'Username and password required'}, status=status.HTTP_400_BAD_REQUEST)
 # Create your views here.
